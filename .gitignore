@@ -1,7 +1,2 @@
-# dirs
-__pycache__
-/.idea/
-/venv/
-
 # files
 .DS_Store
