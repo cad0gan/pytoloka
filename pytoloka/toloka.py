@@ -23,7 +23,7 @@ class Toloka(Yandex):
             )
             json = await response.json()
             cookies = self._cookies.filter_cookies('https://toloka.yandex.ru')
-            for name, value in cookies.items():
-                if name == 'toloka-csrftoken':
-                    self._headers['X-CSRF-Token'] = value.value
+            toloka_csrftoken = cookies.get('toloka-csrftoken')
+            if toloka_csrftoken:
+                self._headers['X-CSRF-Token'] = toloka_csrftoken.value
             return json
