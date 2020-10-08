@@ -1,5 +1,6 @@
 import re
 import uuid
+import asyncio
 import aiohttp
 
 
@@ -57,5 +58,5 @@ class Yandex:
 
                 return True
 
-            except (aiohttp.ClientConnectionError, KeyError):
+            except (aiohttp.ClientConnectionError, asyncio.TimeoutError, KeyError):
                 return False
