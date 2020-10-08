@@ -57,5 +57,5 @@ class Yandex:
 
                 return True
 
-            except (ConnectionError, KeyError):
+            except (aiohttp.ClientConnectionError, KeyError):
                 return False
