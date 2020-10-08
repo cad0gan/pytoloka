@@ -1,5 +1,5 @@
 import aiohttp
-from yandex import Yandex
+from pytoloka.yandex import Yandex
 
 
 class Toloka(Yandex):
