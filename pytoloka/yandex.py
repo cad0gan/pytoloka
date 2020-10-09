@@ -8,6 +8,7 @@ class Yandex:
     def __init__(self) -> None:
         self._timeout = aiohttp.ClientTimeout(total=5)
         self._headers: dict = {
+            'Connection': 'keep-alive',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:81.0) Gecko/20100101 Firefox/81.0'
         }
         self._cookies: aiohttp.CookieJar = aiohttp.CookieJar()
