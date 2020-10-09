@@ -1,5 +1,5 @@
-import aiohttp
 import asyncio
+import aiohttp
 from pytoloka.yandex import Yandex
 from pytoloka.exceptions import HttpError
 
@@ -13,7 +13,7 @@ class Toloka(Yandex):
             ) as session:
                 response = await session.get('https://toloka.yandex.ru/api/i-v2/task-suite-pool-groups')
                 result = await response.json()
-        except (aiohttp.ClientConnectionError, asyncio.TimeoutError):
+        except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
             raise HttpError
         return result
 
@@ -38,7 +38,7 @@ class Toloka(Yandex):
                 toloka_csrftoken = cookies.get('toloka-csrftoken')
                 if toloka_csrftoken:
                     self._headers['X-CSRF-Token'] = toloka_csrftoken.value
-        except (aiohttp.ClientConnectionError, asyncio.TimeoutError):
+        except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
             raise HttpError
         return result
 
