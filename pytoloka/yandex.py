@@ -2,6 +2,7 @@ import re
 import uuid
 import asyncio
 import aiohttp
+from pytoloka.exceptions import HttpError
 
 
 class Yandex:
@@ -62,5 +63,7 @@ class Yandex:
 
                 return True
 
-            except (aiohttp.ClientConnectionError, asyncio.TimeoutError, KeyError):
+            except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
+                raise HttpError
+            except KeyError:
                 return False
