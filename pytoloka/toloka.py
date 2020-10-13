@@ -17,6 +17,19 @@ class Toloka(Yandex):
             raise HttpError
         return result
 
+    async def get_skills(self) -> list:
+        result: list = list()
+        try:
+            async with aiohttp.ClientSession(
+                timeout=self._timeout, headers=self._headers, cookie_jar=self._cookies
+            ) as session:
+                response = await session.get('https://toloka.yandex.ru/api/users/current/worker/skills')
+                json = await response.json()
+                result = json.get('content', [])
+        except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
+            raise HttpError
+        return result
+
     async def assign_task(self, pool_id, ref_uuid) -> dict:
         result = dict()
         try:
@@ -41,4 +54,3 @@ class Toloka(Yandex):
         except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
             raise HttpError
         return result
-
