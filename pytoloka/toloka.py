@@ -5,6 +5,8 @@ from pytoloka.exceptions import HttpError
 
 
 class Toloka(Yandex):
+    __max_errors = 3
+
     async def get_tasks(self) -> list:
         result: list = list()
         try:
@@ -28,6 +30,33 @@ class Toloka(Yandex):
                 result = json.get('content', [])
         except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
             raise HttpError
+        return result
+
+    async def get_transactions(self) -> list:
+        result: list = list()
+        url: str = 'https://toloka.yandex.ru/api/users/current/worker/transactions?properties=startDate&direction=DESC'
+        page: int = 0
+        errors: int = 0
+        while True:
+            try:
+                async with aiohttp.ClientSession(
+                    timeout=self._timeout, headers=self._headers, cookie_jar=self._cookies
+                ) as session:
+                    response = await session.get(
+                        url + f'&page={page}&size=20'
+                    )
+                    json = await response.json()
+                    content = json.get('content', [])
+                    result += content
+                    if json['last']:
+                        break
+                    else:
+                        page += 1
+                        errors = 0
+            except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
+                errors += 1
+                if errors >= self.__max_errors:
+                    raise HttpError
         return result
 
     async def assign_task(self, pool_id, ref_uuid) -> dict:
