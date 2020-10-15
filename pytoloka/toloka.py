@@ -66,7 +66,7 @@ class Toloka(Yandex):
                     timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
             ) as session:
                 response = await session.get('https://toloka.yandex.ru/task/{}?refUuid={}'.format(pool_id, ref_uuid))
-                json = await response.text()
+                await response.text()
 
                 response = await session.post(
                     'https://toloka.yandex.ru/api/assignments',
