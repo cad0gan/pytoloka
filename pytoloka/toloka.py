@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+from datetime import datetime
 from pytoloka.yandex import Yandex
 from pytoloka.exceptions import HttpError
 
@@ -47,6 +48,10 @@ class Toloka(Yandex):
                     )
                     json = await response.json()
                     content = json.get('content', [])
+                    for value in content:
+                        value['startDate'] = datetime.strptime(value['startDate'], '%Y-%m-%dT%H:%M:%S.%f')
+                        if 'endDate' in value:
+                            value['endDate'] = datetime.strptime(value['endDate'], '%Y-%m-%dT%H:%M:%S.%f')
                     result += content
                     if json['last']:
                         break
