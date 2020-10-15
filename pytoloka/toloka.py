@@ -33,7 +33,7 @@ class Toloka(Yandex):
             raise HttpError
         return result
 
-    async def get_transactions(self) -> list:
+    async def get_transactions(self, max_count: int = 0) -> list:
         result: list = list()
         url: str = 'https://toloka.yandex.ru/api/users/current/worker/transactions?properties=startDate&direction=DESC'
         page: int = 0
@@ -58,6 +58,9 @@ class Toloka(Yandex):
                     else:
                         page += 1
                         errors = 0
+                    if max_count > 0:
+                        if len(result) >= max_count:
+                            return result[:max_count]
             except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
                 errors += 1
                 if errors >= self.__max_errors:
