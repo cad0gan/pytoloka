@@ -55,7 +55,7 @@ class Toloka(Yandex):
                         value['startDate'] = pytz.utc.localize(value['startDate'])
                         if 'endDate' in value:
                             value['endDate'] = datetime.strptime(value['endDate'], '%Y-%m-%dT%H:%M:%S.%f')
-                            value['endData'] = pytz.utc.localize(value['endData'])
+                            value['endDate'] = pytz.utc.localize(value['endDate'])
                     result += content
                     if json['last']:
                         break
