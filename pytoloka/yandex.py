@@ -12,11 +12,11 @@ class Yandex:
             'Connection': 'keep-alive',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:81.0) Gecko/20100101 Firefox/81.0'
         }
-        self._cookies: aiohttp.CookieJar = aiohttp.CookieJar()
+        self._cookie: aiohttp.CookieJar = aiohttp.CookieJar()
 
     async def login(self, username: str, password: str) -> bool:
         async with aiohttp.ClientSession(
-                timeout=self._timeout, headers=self._headers, cookie_jar=self._cookies
+                timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
         ) as session:
             try:
                 # get initial cookies
@@ -58,8 +58,8 @@ class Yandex:
                 if json['status'] != 'ok':
                     return False
 
-                self._cookies = session.cookie_jar
-                cookies = self._cookies.filter_cookies('https://passport.yandex.ru')
+                self._cookie = session.cookie_jar
+                cookies = self._cookie.filter_cookies('https://passport.yandex.ru')
 
                 return True
 

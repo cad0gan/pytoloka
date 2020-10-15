@@ -11,7 +11,7 @@ class Toloka(Yandex):
         result: list = list()
         try:
             async with aiohttp.ClientSession(
-                    timeout=self._timeout, headers=self._headers, cookie_jar=self._cookies
+                    timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
             ) as session:
                 response = await session.get('https://toloka.yandex.ru/api/i-v2/task-suite-pool-groups')
                 result = await response.json()
@@ -23,7 +23,7 @@ class Toloka(Yandex):
         result: list = list()
         try:
             async with aiohttp.ClientSession(
-                timeout=self._timeout, headers=self._headers, cookie_jar=self._cookies
+                timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
             ) as session:
                 response = await session.get('https://toloka.yandex.ru/api/users/current/worker/skills')
                 json = await response.json()
@@ -40,7 +40,7 @@ class Toloka(Yandex):
         while True:
             try:
                 async with aiohttp.ClientSession(
-                    timeout=self._timeout, headers=self._headers, cookie_jar=self._cookies
+                    timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
                 ) as session:
                     response = await session.get(
                         url + f'&page={page}&size=20'
@@ -63,7 +63,7 @@ class Toloka(Yandex):
         result = dict()
         try:
             async with aiohttp.ClientSession(
-                    timeout=self._timeout, headers=self._headers, cookie_jar=self._cookies
+                    timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
             ) as session:
                 response = await session.get('https://toloka.yandex.ru/task/{}?refUuid={}'.format(pool_id, ref_uuid))
                 json = await response.text()
@@ -76,8 +76,8 @@ class Toloka(Yandex):
                     }
                 )
                 result = await response.json()
-                cookies = self._cookies.filter_cookies('https://toloka.yandex.ru')
-                toloka_csrftoken = cookies.get('toloka-csrftoken')
+                cookie = self._cookie.filter_cookies('https://toloka.yandex.ru')
+                toloka_csrftoken = cookie.get('toloka-csrftoken')
                 if toloka_csrftoken:
                     self._headers['X-CSRF-Token'] = toloka_csrftoken.value
         except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
