@@ -54,7 +54,7 @@ class Toloka(Yandex):
         url: str = 'https://toloka.yandex.ru/api/users/current/worker/transactions?properties=startDate&direction=DESC'
         page: int = 0
         errors: int = 0
-        size: int = 20 if max_count > 20 else max_count
+        size: int = 20 if max_count <= 0 or max_count > 20 else max_count
         while True:
             try:
                 async with aiohttp.ClientSession(
@@ -75,9 +75,8 @@ class Toloka(Yandex):
                     else:
                         page += 1
                         errors = 0
-                    if max_count > 0:
-                        if len(result) >= max_count:
-                            return result[:max_count]
+                    if 0 < max_count <= len(result):
+                        return result[:max_count]
             except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
                 errors += 1
                 if errors >= self.__max_errors:
