@@ -21,17 +21,18 @@ class Toloka(Yandex):
             raise HttpError
         return result
 
-    async def get_skills(self) -> list:
+    async def get_skills(self, max_count: int = 0) -> list:
         result: list = list()
         url: str = 'https://toloka.yandex.ru/api/users/current/worker/skills'
         page: int = 0
         errors: int = 0
+        size: int = 20 if max_count <= 0 or max_count > 20 else max_count
         while True:
             try:
                 async with aiohttp.ClientSession(
                     timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
                 ) as session:
-                    response = await session.get(url + f'?page={page}&size=20')
+                    response = await session.get(url + f'?page={page}&size={size}')
                     json = await response.json()
                     content = json.get('content', [])
                     result += content
@@ -40,6 +41,8 @@ class Toloka(Yandex):
                     else:
                         page += 1
                         errors = 0
+                    if 0 < max_count <= len(result):
+                        return result[:max_count]
             except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
                 errors += 1
                 if errors >= self.__max_errors:
