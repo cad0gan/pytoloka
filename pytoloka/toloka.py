@@ -1,6 +1,7 @@
 import pytz
 import asyncio
 import aiohttp
+import decimal
 from datetime import datetime
 from pytoloka.yandex import Yandex
 from pytoloka.exceptions import HttpError
@@ -29,6 +30,9 @@ class Toloka(Yandex):
             ) as session:
                 response = await session.get('https://toloka.yandex.ru/api/users/current/worker')
                 result = await response.json()
+                result['balance'] = decimal.Decimal(result['balance'])
+                result['blockedBalance'] = decimal.Decimal(result['blockedBalance'])
+
         except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
             raise HttpError
         return result
