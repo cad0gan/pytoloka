@@ -3,3 +3,6 @@
 
 # dirs
 __pycache__
+/build/
+/dist/
+/pytoloka.egg-info/
