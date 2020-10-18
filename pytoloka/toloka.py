@@ -37,6 +37,23 @@ class Toloka(Yandex):
             raise HttpError
         return result
 
+    async def get_analytics(self) -> dict:
+        result = dict()
+        url: str = 'https://toloka.yandex.ru/api/worker/analytics/'
+        fields = [
+            'totalSubmittedAssignmentsCount', 'totalRejectedAssignmentsCount', 'onReviewAssignmentsCount',
+            'totalIncome'
+        ]
+        try:
+            async with aiohttp.ClientSession(
+                timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
+            ) as session:
+                response = await session.get('{}?fields={}'.format(url, '&'.join(fields)))
+                result = await response.json()
+        except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
+            raise HttpError
+        return result
+
     async def get_skills(self, max_count: int = 0) -> list:
         result: list = list()
         url: str = 'https://toloka.yandex.ru/api/users/current/worker/skills'
