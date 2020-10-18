@@ -22,6 +22,31 @@ class Toloka(Yandex):
             raise HttpError
         return result
 
+    async def assign_task(self, pool_id, ref_uuid) -> dict:
+        result = dict()
+        try:
+            async with aiohttp.ClientSession(
+                    timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
+            ) as session:
+                response = await session.get('https://toloka.yandex.ru/task/{}?refUuid={}'.format(pool_id, ref_uuid))
+                await response.text()
+
+                response = await session.post(
+                    'https://toloka.yandex.ru/api/assignments',
+                    json={
+                        'refUuid': ref_uuid,
+                        'poolId': pool_id,
+                    }
+                )
+                result = await response.json()
+                cookie = self._cookie.filter_cookies('https://toloka.yandex.ru')
+                toloka_csrftoken = cookie.get('toloka-csrftoken')
+                if toloka_csrftoken:
+                    self._headers['X-CSRF-Token'] = toloka_csrftoken.value
+        except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
+            raise HttpError
+        return result
+
     async def get_worker(self) -> dict:
         result: dict = dict()
         try:
@@ -33,23 +58,6 @@ class Toloka(Yandex):
                 result['balance'] = decimal.Decimal(result['balance'])
                 result['blockedBalance'] = decimal.Decimal(result['blockedBalance'])
 
-        except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
-            raise HttpError
-        return result
-
-    async def get_analytics(self) -> dict:
-        result = dict()
-        url: str = 'https://toloka.yandex.ru/api/worker/analytics/'
-        fields = [
-            'totalSubmittedAssignmentsCount', 'totalRejectedAssignmentsCount', 'onReviewAssignmentsCount',
-            'totalIncome'
-        ]
-        try:
-            async with aiohttp.ClientSession(
-                timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
-            ) as session:
-                response = await session.get('{}?fields={}'.format(url, '&'.join(fields)))
-                result = await response.json()
         except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
             raise HttpError
         return result
@@ -116,27 +124,19 @@ class Toloka(Yandex):
                     raise HttpError
         return result
 
-    async def assign_task(self, pool_id, ref_uuid) -> dict:
+    async def get_analytics(self) -> dict:
         result = dict()
+        url: str = 'https://toloka.yandex.ru/api/worker/analytics/'
+        fields = [
+            'totalSubmittedAssignmentsCount', 'totalRejectedAssignmentsCount', 'onReviewAssignmentsCount',
+            'totalIncome'
+        ]
         try:
             async with aiohttp.ClientSession(
-                    timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
+                timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
             ) as session:
-                response = await session.get('https://toloka.yandex.ru/task/{}?refUuid={}'.format(pool_id, ref_uuid))
-                await response.text()
-
-                response = await session.post(
-                    'https://toloka.yandex.ru/api/assignments',
-                    json={
-                        'refUuid': ref_uuid,
-                        'poolId': pool_id,
-                    }
-                )
+                response = await session.get('{}?fields={}'.format(url, '&'.join(fields)))
                 result = await response.json()
-                cookie = self._cookie.filter_cookies('https://toloka.yandex.ru')
-                toloka_csrftoken = cookie.get('toloka-csrftoken')
-                if toloka_csrftoken:
-                    self._headers['X-CSRF-Token'] = toloka_csrftoken.value
         except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
             raise HttpError
         return result
