@@ -105,6 +105,7 @@ class Toloka(Yandex):
                     json = await response.json()
                     content = json.get('content', [])
                     for value in content:
+                        value['amount']: decimal.Decimal = decimal.Decimal(value['amount'])
                         value['startDate']: datetime = datetime.strptime(value['startDate'], '%Y-%m-%dT%H:%M:%S.%f')
                         value['startDate'] = pytz.utc.localize(value['startDate'])
                         if 'endDate' in value:
