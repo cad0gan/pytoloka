@@ -23,7 +23,7 @@ class Yandex:
                 response = await session.get(
                     'https://passport.yandex.ru/passport?origin=toloka&mode=auth&retpath=https://toloka.yandex.ru/',
                 )
-                body = await response.text()
+                body: str = await response.text()
                 match = re.search(r'csrf_token.+value="([\w|:]+)"', body)
                 if not match:
                     return False
@@ -40,10 +40,10 @@ class Yandex:
                         'origin': 'toloka',
                     }
                 )
-                json = await response.json()
+                json: dict = await response.json()
                 if json['status'] != 'ok':
                     return False
-                track_id = json['track_id']
+                track_id: str = json['track_id']
 
                 response = await session.post(
                     'https://passport.yandex.ru/registration-validations/auth/multi_step/commit_password',
@@ -54,7 +54,7 @@ class Yandex:
                         'retpath': 'https://toloka.yandex.ru/',
                     }
                 )
-                json = await response.json()
+                json: dict = await response.json()
                 if json['status'] != 'ok':
                     return False
 

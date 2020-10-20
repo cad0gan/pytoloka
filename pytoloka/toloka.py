@@ -8,7 +8,7 @@ from pytoloka.exceptions import HttpError
 
 
 class Toloka(Yandex):
-    __max_errors = 3
+    __max_errors: int = 3
 
     async def get_tasks(self) -> list:
         result: list = list()
@@ -17,7 +17,7 @@ class Toloka(Yandex):
                     timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
             ) as session:
                 response = await session.get('https://toloka.yandex.ru/api/i-v2/task-suite-pool-groups')
-                result = await response.json()
+                result: dict = await response.json()
         except (
                 asyncio.TimeoutError,
                 aiohttp.ClientConnectionError, aiohttp.ClientPayloadError, aiohttp.ContentTypeError
@@ -25,8 +25,8 @@ class Toloka(Yandex):
             raise HttpError
         return result
 
-    async def assign_task(self, pool_id, ref_uuid) -> dict:
-        result = dict()
+    async def assign_task(self, pool_id: int, ref_uuid: str) -> dict:
+        result: dict = dict()
         try:
             async with aiohttp.ClientSession(
                     timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
@@ -60,7 +60,7 @@ class Toloka(Yandex):
                 timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
             ) as session:
                 response = await session.get('https://toloka.yandex.ru/api/users/current/worker')
-                result = await response.json()
+                result: dict = await response.json()
                 result['balance']: Decimal = Decimal(result['balance'])
                 result['blockedBalance']: Decimal = Decimal(result['blockedBalance'])
 
@@ -83,8 +83,8 @@ class Toloka(Yandex):
                     timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
                 ) as session:
                     response = await session.get(url + f'?page={page}&size={size}')
-                    json = await response.json()
-                    content = json.get('content', [])
+                    json: dict = await response.json()
+                    content: list = json.get('content', list())
                     result += content
                     if json['last']:
                         break
@@ -114,8 +114,8 @@ class Toloka(Yandex):
                     timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
                 ) as session:
                     response = await session.get(url + f'&page={page}&size={size}')
-                    json = await response.json()
-                    content = json.get('content', [])
+                    json: dict = await response.json()
+                    content: list = json.get('content', list())
                     for value in content:
                         value['amount']: Decimal = Decimal(value['amount'])
                         value['startDate']: datetime = datetime.strptime(value['startDate'], '%Y-%m-%dT%H:%M:%S.%f')
@@ -141,7 +141,7 @@ class Toloka(Yandex):
         return result
 
     async def get_analytics(self) -> dict:
-        result = dict()
+        result: dict = dict()
         url: str = 'https://toloka.yandex.ru/api/worker/analytics/'
         fields = [
             'totalSubmittedAssignmentsCount', 'totalRejectedAssignmentsCount', 'onReviewAssignmentsCount',
@@ -152,7 +152,7 @@ class Toloka(Yandex):
                 timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
             ) as session:
                 response = await session.get('{}?fields={}'.format(url, '&'.join(fields)))
-                result = await response.json()
+                result: dict = await response.json()
         except (
                 asyncio.TimeoutError,
                 aiohttp.ClientConnectionError, aiohttp.ClientPayloadError, aiohttp.ContentTypeError
