@@ -18,7 +18,10 @@ class Toloka(Yandex):
             ) as session:
                 response = await session.get('https://toloka.yandex.ru/api/i-v2/task-suite-pool-groups')
                 result = await response.json()
-        except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
+        except (
+                asyncio.TimeoutError,
+                aiohttp.ClientConnectionError, aiohttp.ClientPayloadError, aiohttp.ContentTypeError
+        ):
             raise HttpError
         return result
 
@@ -43,7 +46,10 @@ class Toloka(Yandex):
                 toloka_csrftoken = cookie.get('toloka-csrftoken')
                 if toloka_csrftoken:
                     self._headers['X-CSRF-Token'] = toloka_csrftoken.value
-        except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
+        except (
+                asyncio.TimeoutError,
+                aiohttp.ClientConnectionError, aiohttp.ClientPayloadError, aiohttp.ContentTypeError
+        ):
             raise HttpError
         return result
 
@@ -58,7 +64,10 @@ class Toloka(Yandex):
                 result['balance']: Decimal = Decimal(result['balance'])
                 result['blockedBalance']: Decimal = Decimal(result['blockedBalance'])
 
-        except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
+        except (
+                asyncio.TimeoutError,
+                aiohttp.ClientConnectionError, aiohttp.ClientPayloadError, aiohttp.ContentTypeError
+        ):
             raise HttpError
         return result
 
@@ -84,7 +93,10 @@ class Toloka(Yandex):
                         errors = 0
                     if 0 < max_count <= len(result):
                         return result[:max_count]
-            except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
+            except (
+                    asyncio.TimeoutError,
+                    aiohttp.ClientConnectionError, aiohttp.ClientPayloadError, aiohttp.ContentTypeError
+            ):
                 errors += 1
                 if errors >= self.__max_errors:
                     raise HttpError
@@ -119,7 +131,10 @@ class Toloka(Yandex):
                         errors = 0
                     if 0 < max_count <= len(result):
                         return result[:max_count]
-            except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
+            except (
+                    asyncio.TimeoutError,
+                    aiohttp.ClientConnectionError, aiohttp.ClientPayloadError, aiohttp.ContentTypeError
+            ):
                 errors += 1
                 if errors >= self.__max_errors:
                     raise HttpError
@@ -138,6 +153,9 @@ class Toloka(Yandex):
             ) as session:
                 response = await session.get('{}?fields={}'.format(url, '&'.join(fields)))
                 result = await response.json()
-        except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
+        except (
+                asyncio.TimeoutError,
+                aiohttp.ClientConnectionError, aiohttp.ClientPayloadError, aiohttp.ContentTypeError
+        ):
             raise HttpError
         return result
