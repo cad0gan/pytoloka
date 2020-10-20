@@ -63,7 +63,10 @@ class Yandex:
 
                 return True
 
-            except (asyncio.TimeoutError, aiohttp.ClientConnectionError, aiohttp.ClientPayloadError):
+            except (
+                    asyncio.TimeoutError,
+                    aiohttp.ClientConnectionError, aiohttp.ClientPayloadError, aiohttp.ContentTypeError
+            ):
                 raise HttpError
             except KeyError:
                 return False
