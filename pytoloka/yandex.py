@@ -57,10 +57,7 @@ class Yandex:
                 json: dict = await response.json()
                 if json['status'] != 'ok':
                     return False
-
                 self._cookie = session.cookie_jar
-                cookies = self._cookie.filter_cookies('https://passport.yandex.ru')
-
                 return True
 
             except (
