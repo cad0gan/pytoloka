@@ -1,10 +1,11 @@
 import pytz
 import asyncio
 import aiohttp
+from typing import Union
 from decimal import Decimal
 from datetime import datetime
 from pytoloka.yandex import Yandex
-from pytoloka.exceptions import HttpError
+from pytoloka.exceptions import HttpError, AccessDeniedError
 
 
 class Toloka(Yandex):
@@ -17,7 +18,9 @@ class Toloka(Yandex):
                     timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
             ) as session:
                 response = await session.get('https://toloka.yandex.ru/api/i-v2/task-suite-pool-groups')
-                result = await response.json()
+                json: Union[list, dict] = await response.json()
+                if isinstance(json, dict) and json.get('code') == 'ACCESS_DENIED':
+                    raise AccessDeniedError
         except (
                 asyncio.TimeoutError,
                 aiohttp.ClientConnectionError, aiohttp.ClientPayloadError, aiohttp.ContentTypeError
