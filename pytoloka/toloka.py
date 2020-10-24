@@ -21,6 +21,8 @@ class Toloka(Yandex):
                 json: Union[list, dict] = await response.json()
                 if isinstance(json, dict) and json.get('code') == 'ACCESS_DENIED':
                     raise AccessDeniedError
+                else:
+                    result = json
         except (
                 asyncio.TimeoutError,
                 aiohttp.ClientConnectionError, aiohttp.ClientPayloadError, aiohttp.ContentTypeError
