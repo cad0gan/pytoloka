@@ -11,6 +11,26 @@ from pytoloka.exceptions import HttpError, AccessDeniedError
 class Toloka(Yandex):
     __max_errors: int = 3
 
+    async def pass_captcha(self, key: str, captcha: str) -> dict:
+        result: dict = dict()
+        try:
+            async with aiohttp.ClientSession(
+                timeout=self._timeout, headers=self._headers, cookie_jar=self._cookie
+            ) as session:
+                response = await session.patch(
+                    f'https://toloka.yandex.ru/api/dmz/captchas/{key}',
+                    json={
+                        'userInput': captcha
+                    }
+                )
+                result = await response.json()
+        except (
+            asyncio.TimeoutError,
+            aiohttp.ClientConnectionError, aiohttp.ClientPayloadError, aiohttp.ContentTypeError
+        ):
+            raise HttpError
+        return result
+
     async def get_tasks(self) -> list:
         result: list = list()
         try:
