@@ -168,7 +168,7 @@ class Toloka(Yandex):
     async def get_analytics(self) -> dict:
         result: dict = dict()
         url: str = 'https://toloka.yandex.ru/api/worker/analytics/'
-        fields = [
+        fields: list = [
             'totalSubmittedAssignmentsCount', 'totalRejectedAssignmentsCount', 'onReviewAssignmentsCount',
             'totalIncome'
         ]

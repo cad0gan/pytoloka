@@ -7,7 +7,7 @@ from pytoloka.exceptions import HttpError
 
 class Yandex:
     def __init__(self) -> None:
-        self._timeout = aiohttp.ClientTimeout(total=5)
+        self._timeout: aiohttp.ClientTimeout = aiohttp.ClientTimeout(total=5)
         self._headers: dict = {
             'Connection': 'keep-alive',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:81.0) Gecko/20100101 Firefox/81.0'
@@ -27,7 +27,7 @@ class Yandex:
                 match = re.search(r'csrf_token.+value="([\w|:]+)"', body)
                 if not match:
                     return False
-                csrf_token = match.group(1)
+                csrf_token: str = match.group(1)
 
                 # start
                 response = await session.post(
