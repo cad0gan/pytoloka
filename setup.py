@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='pytoloka',
-    version='0.0.1',
+    version='0.1.0',
     author='Philip Minakov',
     author_email='sir.cadogan@protonmail.com',
     description='An async library for Yandex.Toloka',
